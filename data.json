@@ -1,0 +1,136 @@
+[
+  {
+    "title": "Raiders of the Lost Ark",
+    "year": 1981,
+    "type": "movie",
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "favorite": true,
+    "rating": 5,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "Ready Player One",
+    "year": 2018,
+    "type": "movie",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "favorite": true,
+    "rating": 5,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "The Princess Diaries",
+    "year": 2001,
+    "type": "movie",
+    "genres": [
+      "Comedy",
+      "Family",
+      "Romance"
+    ],
+    "favorite": true,
+    "rating": 0,
+    "onServer": false,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "The Devil Wears Prada",
+    "year": 2006,
+    "type": "movie",
+    "genres": [
+      "Comedy",
+      "Drama"
+    ],
+    "favorite": true,
+    "rating": 4,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "Batman Begins",
+    "year": 2005,
+    "type": "movie",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "favorite": true,
+    "rating": 0,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "Rogue One: A Star Wars Story",
+    "year": 2016,
+    "type": "movie",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "favorite": true,
+    "rating": 0,
+    "onServer": false,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "The Iron Giant",
+    "year": 1999,
+    "type": "movie",
+    "genres": [
+      "Animation",
+      "Family",
+      "Sci-Fi",
+      "Adventure"
+    ],
+    "favorite": true,
+    "rating": 5,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "Crazy Rich Asians",
+    "year": 2018,
+    "type": "movie",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Romance"
+    ],
+    "favorite": true,
+    "rating": 5,
+    "onServer": true,
+    "watched": true,
+    "keywords": []
+  },
+  {
+    "title": "The Odyssey",
+    "year": 2026,
+    "type": "movie",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "favorite": true,
+    "rating": 0,
+    "onServer": false,
+    "watched": false,
+    "keywords": []
+  }
+]
