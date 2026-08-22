@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<title>Watched</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b1220;
+    --bg-panel: #121a2c;
+    --bg-panel-2: #16203590;
+    --bg-row-hover: #17233a;
+    --border: #223049;
+    --border-soft: #1a2438;
+    --text: #eef2f8;
+    --text-dim: #8493ad;
+    --text-faint: #56637d;
+    --accent-a: #22d3ee;
+    --accent-b: #34d399;
+    --heart: #f43f5e;
+    --rating-star: #fbbf24;
+    --watchlist: #f97316;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    background: #0b1220 !important;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: #0b1220 !important;
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 28px 80px;
+  }
+
+  /* ---------------- Header ---------------- */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 32px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border-soft);
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+  }
+
+  .page-header h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.5px;
+    color: #ffffff;
+    margin: 0;
+  }
+
+  .page-header .tagline {
+    color: var(--text-dim);
+    font-size: 15px;
+    line-height: 1.5;
+    max-width: 360px;
+    margin: 0 0 4px;
+    text-align: right;
+  }
+
+  /* ---------------- Filter bar ---------------- */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .search-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    border-radius: 10px;
+    min-width: 240px;
+  }
+
+  .search-icon {
+    width: 15px;
+    height: 15px;
+    color: var(--text-faint);
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13.5px;
+    width: 100%;
+  }
+  .search-input::placeholder { color: var(--text-faint); }
+
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+
+  .filter-btn:hover { border-color: #2c3b58; background: #141d31; }
+
+  .filter-btn.active {
+    border-color: var(--accent-a);
+    box-shadow: 0 0 0 1px var(--accent-a) inset, 0 0 14px -4px var(--accent-a);
+    color: var(--accent-a);
+  }
+
+  .filter-btn .chevron {
+    width: 10px; height: 10px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform .15s ease;
+    margin-top: -3px;
+  }
+  .filter-btn.open .chevron { transform: rotate(-135deg); margin-top: 3px; }
+
+  .genre-dropdown-wrap { position: relative; }
+
+  .genre-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    min-width: 240px;
+    max-height: 360px;
+    overflow-y: auto;
+    background: #101828;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6);
+    display: none;
+    z-index: 50;
+  }
+  .genre-dropdown.open { display: block; }
+
+  .genre-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    user-select: none;
+  }
+  .genre-option:hover { background: #182238; color: var(--text); }
+  .genre-option input[type="checkbox"] { display: none; }
+
+  .genre-option .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: #2a3650;
+    border: 1.5px solid #3a4a6b;
+    transition: all .15s ease;
+  }
+  .genre-option .dot.on {
+    background: var(--dot-color);
+    border-color: var(--dot-color);
+    box-shadow: 0 0 6px 1px var(--dot-color), 0 0 14px 3px color-mix(in srgb, var(--dot-color) 60%, transparent);
+  }
+  .genre-option:has(.dot.on) .genre-label { color: var(--text); }
+
+  /* ---------------- Favorites switch ---------------- */
+  .favorites-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 9px 14px 9px 16px;
+    border-radius: 10px;
+  }
+
+  .favorites-toggle span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  .switch {
+    width: 38px;
+    height: 21px;
+    border-radius: 999px;
+    background: #232f47;
+    border: 1px solid #2f3d5a;
+    position: relative;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #7c8aa5;
+    transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+  }
+  .switch.on {
+    background: #0f3d2e;
+    border-color: var(--accent-b);
+  }
+  .switch.on::after {
+    transform: translateX(17px);
+    background: var(--accent-b);
+    box-shadow: 0 0 8px 1px var(--accent-b), 0 0 16px 4px rgba(52,211,153,0.45);
+  }
+
+  .switch-watchlist.on {
+    background: #422510;
+    border-color: var(--watchlist);
+  }
+  .switch-watchlist.on::after {
+    background: var(--watchlist);
+    box-shadow: 0 0 8px 1px var(--watchlist), 0 0 16px 4px rgba(249,115,22,0.45);
+  }
+
+  /* ---------------- Unwatched indicator dot ---------------- */
+  .unwatched-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--watchlist);
+    box-shadow: 0 0 6px 1px var(--watchlist), 0 0 14px 3px rgba(249,115,22,0.55);
+    flex-shrink: 0;
+    display: inline-block;
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--watchlist);
+    box-shadow: 0 0 5px 1px var(--watchlist);
+    display: inline-block;
+  }
+
+  /* ---------------- Rating filter ---------------- */
+  .rating-filter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    border-radius: 10px;
+  }
+
+  .rating-filter .rating-filter-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  .rating-filter-stars {
+    display: flex;
+    gap: 2px;
+  }
+
+  .rating-star-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 3px;
+    display: inline-flex;
+    color: #2c3a56;
+    transition: color .15s ease, filter .15s ease, transform .1s ease;
+  }
+  .rating-star-btn:hover { transform: scale(1.12); }
+  .rating-star-btn.lit {
+    color: var(--rating-star);
+    filter: drop-shadow(0 0 5px rgba(251,191,36,0.65));
+  }
+  .rating-star-btn.preview { color: #4a5a7d; }
+
+  /* ---------------- Table card ---------------- */
+  .table-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  .table-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+  }
+
+  .tabs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 6px 18px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .tabs .tab-group { display: flex; gap: 4px; }
+
+  .tab {
+    background: none;
+    border: none;
+    color: var(--text-faint);
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 14px 6px;
+    margin-right: 22px;
+    cursor: pointer;
+    position: relative;
+  }
+  .tab:hover { color: var(--text-dim); }
+  .tab.active { color: #ffffff; }
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+    border-radius: 2px;
+  }
+
+  .count-label {
+    color: var(--text-faint);
+    font-size: 13px;
+    padding-bottom: 12px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-soft);
+    transition: background .12s ease;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg-row-hover); }
+
+  td {
+    padding: 16px 18px;
+    vertical-align: middle;
+  }
+
+  thead th {
+    padding: 16px 18px 6px;
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .sort-header {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-faint);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 4px 0;
+    transition: color .15s ease;
+  }
+  .sort-header:hover { color: var(--text-dim); }
+  .sort-header.active { color: var(--accent-a); }
+
+  .sort-arrow {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 5px solid currentColor;
+    opacity: 0;
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .sort-header.active .sort-arrow { opacity: 1; }
+  .sort-header.active.desc .sort-arrow { transform: rotate(180deg); }
+
+  .col-title {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 15px;
+    width: 42%;
+  }
+
+  .title-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .rating-inline {
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 14px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .rating-inline svg {
+    width: 12px;
+    height: 12px;
+    fill: var(--text-faint);
+    position: relative;
+    top: 1px;
+  }
+
+  .col-year {
+    color: var(--text-faint);
+    font-weight: 400;
+    font-size: 14px;
+    width: 10%;
+    white-space: nowrap;
+  }
+
+  .col-tags {
+    width: 32%;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    margin: 2px 5px 2px 0;
+    color: var(--tag-color);
+    background: color-mix(in srgb, var(--tag-color) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tag-color) 45%, transparent);
+  }
+
+  .col-server,
+  .col-fav {
+    width: 8%;
+    text-align: right;
+  }
+
+  .heart-btn,
+  .check-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #2c3a56;
+    padding: 4px;
+    display: inline-flex;
+    transition: color .15s ease, filter .15s ease;
+  }
+  .heart-btn:hover,
+  .check-btn:hover { color: #4a5a7d; }
+  .heart-btn.on {
+    color: var(--heart);
+    filter: drop-shadow(0 0 5px rgba(244,63,94,0.7));
+  }
+  .check-btn.on {
+    color: var(--accent-b);
+    filter: drop-shadow(0 0 5px rgba(52,211,153,0.7));
+  }
+
+  /* ---------------- Legend ---------------- */
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin: -8px 0 16px 4px;
+    color: var(--text-faint);
+    font-size: 12.5px;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-item svg {
+    width: 13px;
+    height: 13px;
+  }
+  .legend-item.legend-check svg { color: var(--accent-b); }
+  .legend-item.legend-heart svg { color: var(--heart); }
+
+  .empty-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 64px 20px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+  .empty-state strong { color: var(--text-dim); font-size: 15px; }
+
+  @media (max-width: 640px) {
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .page-header .tagline { text-align: left; }
+    .page-header h1 { font-size: 34px; }
+    .col-tags { display: none; }
+    .col-title { width: 60%; }
+  }
+</style>
+</head>
+<body style="background-color:#0b1220; margin:0;">
+
+<div class="page">
+
+  <header class="page-header">
+    <h1>Media<br>Logbook</h1>
+    <p class="tagline">A running log of the movies and shows I have watched, rated, or plan to see. Designed to keep track of recommendations, key details, and what to watch next.</p>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-bar-left">
+      <div class="genre-dropdown-wrap">
+        <button class="filter-btn" id="genreFilterBtn">
+          <span id="genreBtnLabel">Genres</span>
+          <span class="chevron"></span>
+        </button>
+        <div class="genre-dropdown" id="genreDropdown">
+          <div id="genreList"></div>
+        </div>
+      </div>
+
+      <div class="rating-filter" id="ratingFilter">
+        <span class="rating-filter-label">Rating</span>
+        <div class="rating-filter-stars" id="ratingFilterStars"></div>
+      </div>
+
+      <div class="favorites-toggle">
+        <span>Favorites</span>
+        <button class="switch" id="favSwitch" role="switch" aria-checked="false"></button>
+      </div>
+
+      <div class="favorites-toggle watchlist-toggle">
+        <span>Watchlist</span>
+        <button class="switch switch-watchlist" id="watchlistSwitch" role="switch" aria-checked="false"></button>
+      </div>
+    </div>
+
+    <div class="search-control">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search title, year, genre..." autocomplete="off" />
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="legend-item legend-check">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 12 9 17 20 6"/></svg>
+      <span>On media server</span>
+    </span>
+    <span class="legend-item legend-heart">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.65-8.03C.6 10.9.5 7.9 2.5 6.02 4.4 4.24 7.3 4.5 9 6.5l3 3.3 3-3.3c1.7-2 4.6-2.26 6.5-.48 2 1.88 1.9 4.88.15 6.95C18.7 16.65 12 21 12 21z"/></svg>
+      <span>Favorite</span>
+    </span>
+    <span class="legend-item legend-unwatched">
+      <span class="legend-dot"></span>
+      <span>Unwatched</span>
+    </span>
+  </div>
+
+  <div class="table-card">
+    <div class="tabs">
+      <div class="tab-group">
+        <button class="tab active" data-type="movie">Movies</button>
+        <button class="tab" data-type="tv">TV Shows</button>
+      </div>
+      <span class="count-label" id="countLabel"></span>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th class="col-title">
+            <button class="sort-header" id="sortHeaderTitle" data-sort="title">Title<span class="sort-arrow"></span></button>
+          </th>
+          <th class="col-year">
+            <button class="sort-header" id="sortHeaderYear" data-sort="year">Year<span class="sort-arrow"></span></button>
+          </th>
+          <th class="col-tags">Genres</th>
+          <th class="col-server"></th>
+          <th class="col-fav"></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+
+    <div class="empty-state" id="emptyState">
+      <strong>Nothing here yet</strong>
+      <span>Try a different genre filter, or turn off the favorites switch.</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/*
+  WATCHLIST DATA
+  --------------
+  Add new entries to this array. Each entry:
+  {
+    title:    "Movie or Show Name",
+    year:     1999,                      // release year (first air year for TV)
+    type:     "movie" | "tv",
+    genres:   ["Action", "Adventure"],   // can be any number of genres
+    favorite: false,                      // true = heart / favorite
+    rating:   0,                          // 0-5, shown as "4/5 ★" next to the title. Use 0 or omit for unrated.
+    onServer: false,                      // true = check mark / on media server
+    watched:  true,                       // false = orange glowing dot + shows under the Watchlist filter
+    keywords: []                          // optional hidden search terms, e.g. ["heist","time travel"] - not shown on the page, but searchable
+  }
+
+  Genre colors are assigned automatically (see GENRE_COLORS + fallback hash
+  function below), so a brand-new genre never breaks the styling.
+*/
+const WATCHLIST = [
+  {
+    title: "Raiders of the Lost Ark",
+    year: 1981,
+    type: "movie",
+    genres: ["Action", "Adventure"],
+    favorite: true,
+    rating: 5,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "Ready Player One",
+    year: 2018,
+    type: "movie",
+    genres: ["Action", "Adventure", "Sci-Fi"],
+    favorite: true,
+    rating: 5,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "The Princess Diaries",
+    year: 2001,
+    type: "movie",
+    genres: ["Comedy", "Family", "Romance"],
+    favorite: false,
+    rating: 0,
+    onServer: false,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "The Devil Wears Prada",
+    year: 2006,
+    type: "movie",
+    genres: ["Comedy", "Drama"],
+    favorite: false,
+    rating: 4,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "Batman Begins",
+    year: 2005,
+    type: "movie",
+    genres: ["Action", "Crime", "Drama"],
+    favorite: false,
+    rating: 0,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "Rogue One: A Star Wars Story",
+    year: 2016,
+    type: "movie",
+    genres: ["Action", "Adventure", "Sci-Fi"],
+    favorite: false,
+    rating: 0,
+    onServer: false,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "The Iron Giant",
+    year: 1999,
+    type: "movie",
+    genres: ["Animation", "Family", "Sci-Fi", "Adventure"],
+    favorite: true,
+    rating: 5,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "Crazy Rich Asians",
+    year: 2018,
+    type: "movie",
+    genres: ["Comedy", "Drama", "Romance"],
+    favorite: true,
+    rating: 5,
+    onServer: true,
+    watched: true,
+    keywords: []
+  },
+  {
+    title: "The Odyssey",
+    year: 2026,
+    type: "movie",
+    genres: ["Action", "Adventure", "Fantasy"],
+    favorite: false,
+    rating: 0,
+    onServer: false,
+    watched: false,
+    keywords: []
+  }
+];
+
+/* ---------------------------------------------------------
+   Genre color palette — echoes the dot-indicator language.
+   Add specific overrides here any time; anything not listed
+   falls back to an automatically-hashed color so new genres
+   never break the design.
+--------------------------------------------------------- */
+const GENRE_COLORS = {
+  "Action":        "#f97316", // orange
+  "Adventure":     "#22d3ee", // cyan
+  "Sci-Fi":        "#8b5cf6", // violet
+  "Fantasy":       "#a78bfa", // light purple
+  "Comedy":        "#fbbf24", // amber
+  "Drama":         "#f472b6", // pink
+  "Horror":        "#ef4444", // red
+  "Thriller":      "#fb7185", // rose
+  "Animation":     "#34d399", // green
+  "Romance":       "#f43f5e", // ruby
+  "Mystery":       "#60a5fa", // blue
+  "Crime":         "#94a3b8", // slate
+  "Documentary":   "#2dd4bf", // teal
+  "Family":        "#facc15", // yellow
+  "Musical":       "#e879f9", // fuchsia
+  "War":           "#78716c", // stone
+  "Biography":     "#38bdf8", // sky
+  "History":       "#c084fc"  // purple
+};
+
+// Deterministic fallback color for any genre not in the map above.
+function colorForGenre(genre) {
+  if (GENRE_COLORS[genre]) return GENRE_COLORS[genre];
+  let hash = 0;
+  for (let i = 0; i < genre.length; i++) {
+    hash = genre.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const hue = Math.abs(hash) % 360;
+  return `hsl(${hue}, 70%, 60%)`;
+}
+
+/* ---------------------------------------------------------
+   State
+--------------------------------------------------------- */
+const state = {
+  type: "movie",           // "movie" | "tv"
+  activeGenres: new Set(), // selected genre filters
+  favoritesOnly: false,
+  watchlistOnly: false,    // true = show only unwatched items
+  minRating: 0,            // 0 = no rating filter, 1-5 = at least that many stars
+  sortBy: "year",          // "year" | "title" | "rating"
+  sortDir: "desc",         // "asc" | "desc"
+  searchQuery: ""
+};
+
+/* ---------------------------------------------------------
+   Derived data
+--------------------------------------------------------- */
+function allGenres() {
+  const set = new Set();
+  WATCHLIST.forEach(item => item.genres.forEach(g => set.add(g)));
+  return Array.from(set).sort();
+}
+
+function sortItems(items) {
+  const sorted = items.slice();
+  const dir = state.sortDir === "asc" ? 1 : -1;
+
+  if (state.sortBy === "title") {
+    sorted.sort((a, b) => dir * a.title.localeCompare(b.title));
+  } else if (state.sortBy === "rating") {
+    sorted.sort((a, b) => dir * ((a.rating || 0) - (b.rating || 0)) || a.title.localeCompare(b.title));
+  } else {
+    sorted.sort((a, b) => dir * (a.year - b.year) || a.title.localeCompare(b.title));
+  }
+  return sorted;
+}
+
+function matchesSearch(item, query) {
+  if (!query) return true;
+  const haystack = [
+    item.title,
+    String(item.year),
+    ...(item.genres || []),
+    ...(item.keywords || [])
+  ].join(" ").toLowerCase();
+  return haystack.includes(query);
+}
+
+function filteredItems() {
+  const query = state.searchQuery.trim().toLowerCase();
+  const items = WATCHLIST.filter(item => {
+    if (item.type !== state.type) return false;
+    if (state.favoritesOnly && !item.favorite) return false;
+    if (state.watchlistOnly && item.watched) return false;
+    if (state.minRating > 0 && (item.rating || 0) < state.minRating) return false;
+    if (state.activeGenres.size > 0) {
+      const hasGenre = item.genres.some(g => state.activeGenres.has(g));
+      if (!hasGenre) return false;
+    }
+    if (!matchesSearch(item, query)) return false;
+    return true;
+  });
+  return sortItems(items);
+}
+
+/* ---------------------------------------------------------
+   Rendering
+--------------------------------------------------------- */
+const genreListEl = document.getElementById("genreList");
+const rowsEl = document.getElementById("rows");
+const emptyStateEl = document.getElementById("emptyState");
+const genreBtnLabel = document.getElementById("genreBtnLabel");
+const countLabel = document.getElementById("countLabel");
+
+function renderGenreDropdown() {
+  const genres = allGenres();
+  genreListEl.innerHTML = "";
+  genres.forEach(genre => {
+    const color = colorForGenre(genre);
+    const row = document.createElement("label");
+    row.className = "genre-option";
+    row.style.setProperty("--dot-color", color);
+
+    const dot = document.createElement("span");
+    dot.className = "dot";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = state.activeGenres.has(genre);
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        state.activeGenres.add(genre);
+      } else {
+        state.activeGenres.delete(genre);
+      }
+      dot.classList.toggle("on", checkbox.checked);
+      updateGenreButtonLabel();
+      renderTable();
+    });
+
+    const text = document.createElement("span");
+    text.className = "genre-label";
+    text.textContent = genre;
+
+    if (checkbox.checked) dot.classList.add("on");
+
+    row.appendChild(checkbox);
+    row.appendChild(dot);
+    row.appendChild(text);
+    genreListEl.appendChild(row);
+  });
+}
+
+function updateGenreButtonLabel() {
+  const n = state.activeGenres.size;
+  genreBtnLabel.textContent = n === 0 ? "Genres" : `Genres · ${n}`;
+  document.getElementById("genreFilterBtn").classList.toggle("active", n > 0);
+}
+
+function renderTable() {
+  const items = filteredItems();
+  rowsEl.innerHTML = "";
+
+  items.forEach(item => {
+    const tr = document.createElement("tr");
+
+    const titleTd = document.createElement("td");
+    titleTd.className = "col-title";
+
+    const titleCell = document.createElement("div");
+    titleCell.className = "title-cell";
+
+    if (!item.watched) {
+      const dot = document.createElement("span");
+      dot.className = "unwatched-dot";
+      dot.title = "Unwatched / on watchlist";
+      titleCell.appendChild(dot);
+    }
+
+    const titleText = document.createElement("span");
+    titleText.className = "title-text";
+    titleText.textContent = item.title;
+    titleCell.appendChild(titleText);
+
+    if (item.rating) {
+      const rating = document.createElement("span");
+      rating.className = "rating-inline";
+      rating.innerHTML = `${item.rating}/5 ${starIcon()}`;
+      titleCell.appendChild(rating);
+    }
+
+    titleTd.appendChild(titleCell);
+
+    const yearTd = document.createElement("td");
+    yearTd.className = "col-year";
+    yearTd.textContent = item.year;
+
+    const tagsTd = document.createElement("td");
+    tagsTd.className = "col-tags";
+    item.genres.forEach(g => {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      const c = colorForGenre(g);
+      tag.style.setProperty("--tag-color", c);
+      tag.textContent = g;
+      tagsTd.appendChild(tag);
+    });
+
+    const serverTd = document.createElement("td");
+    serverTd.className = "col-server";
+    const check = document.createElement("button");
+    check.className = "check-btn" + (item.onServer ? " on" : "");
+    check.setAttribute("aria-label", "Toggle on media server");
+    check.innerHTML = checkIcon();
+    check.addEventListener("click", () => {
+      item.onServer = !item.onServer;
+      check.classList.toggle("on", item.onServer);
+    });
+    serverTd.appendChild(check);
+
+    const favTd = document.createElement("td");
+    favTd.className = "col-fav";
+    const heart = document.createElement("button");
+    heart.className = "heart-btn" + (item.favorite ? " on" : "");
+    heart.setAttribute("aria-label", "Toggle favorite");
+    heart.innerHTML = heartIcon();
+    heart.addEventListener("click", () => {
+      item.favorite = !item.favorite;
+      heart.classList.toggle("on", item.favorite);
+      if (state.favoritesOnly && !item.favorite) {
+        renderTable();
+      }
+    });
+    favTd.appendChild(heart);
+
+    tr.appendChild(titleTd);
+    tr.appendChild(yearTd);
+    tr.appendChild(tagsTd);
+    tr.appendChild(serverTd);
+    tr.appendChild(favTd);
+    rowsEl.appendChild(tr);
+  });
+
+  emptyStateEl.style.display = items.length === 0 ? "flex" : "none";
+  const noun = state.type === "movie" ? "movie" : "show";
+  countLabel.textContent = `${items.length} ${noun}${items.length === 1 ? "" : "s"}`;
+}
+
+function starIcon() {
+  return `<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor">
+    <path d="M12 2.5l2.9 6.53 7.1.62-5.4 4.73 1.63 6.98L12 17.77l-6.23 3.6 1.63-6.99-5.4-4.72 7.1-.62L12 2.5z"/>
+  </svg>`;
+}
+
+function heartIcon() {
+  return `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <path d="M12 21s-6.7-4.35-9.65-8.03C.6 10.9.5 7.9 2.5 6.02 4.4 4.24 7.3 4.5 9 6.5l3 3.3 3-3.3c1.7-2 4.6-2.26 6.5-.48 2 1.88 1.9 4.88.15 6.95C18.7 16.65 12 21 12 21z"/>
+  </svg>`;
+}
+
+function checkIcon() {
+  return `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="4 12 9 17 20 6"/>
+  </svg>`;
+}
+
+/* ---------------------------------------------------------
+   Tabs (Movies / TV Shows)
+--------------------------------------------------------- */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    state.type = tab.dataset.type;
+    renderTable();
+  });
+});
+
+/* ---------------------------------------------------------
+   Genre dropdown open/close
+--------------------------------------------------------- */
+const genreFilterBtn = document.getElementById("genreFilterBtn");
+const genreDropdown = document.getElementById("genreDropdown");
+
+genreFilterBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  genreDropdown.classList.toggle("open");
+  genreFilterBtn.classList.toggle("open");
+});
+
+document.addEventListener("click", (e) => {
+  if (!genreDropdown.contains(e.target) && e.target !== genreFilterBtn) {
+    genreDropdown.classList.remove("open");
+    genreFilterBtn.classList.remove("open");
+  }
+});
+
+/* ---------------------------------------------------------
+   Favorites switch
+--------------------------------------------------------- */
+const favSwitch = document.getElementById("favSwitch");
+favSwitch.addEventListener("click", () => {
+  state.favoritesOnly = !state.favoritesOnly;
+  favSwitch.classList.toggle("on", state.favoritesOnly);
+  favSwitch.setAttribute("aria-checked", state.favoritesOnly);
+  renderTable();
+});
+
+/* ---------------------------------------------------------
+   Watchlist switch (shows only unwatched items)
+--------------------------------------------------------- */
+const watchlistSwitch = document.getElementById("watchlistSwitch");
+watchlistSwitch.addEventListener("click", () => {
+  state.watchlistOnly = !state.watchlistOnly;
+  watchlistSwitch.classList.toggle("on", state.watchlistOnly);
+  watchlistSwitch.setAttribute("aria-checked", state.watchlistOnly);
+  renderTable();
+});
+
+/* ---------------------------------------------------------
+   Search box (title, year, genre, hidden keywords)
+--------------------------------------------------------- */
+const searchInput = document.getElementById("searchInput");
+searchInput.addEventListener("input", () => {
+  state.searchQuery = searchInput.value;
+  renderTable();
+});
+
+/* ---------------------------------------------------------
+   Column header sorting
+--------------------------------------------------------- */
+const sortHeaders = document.querySelectorAll(".sort-header");
+
+function updateSortHeaderUI() {
+  sortHeaders.forEach(btn => {
+    const isActive = btn.dataset.sort === state.sortBy;
+    btn.classList.toggle("active", isActive);
+    btn.classList.toggle("desc", isActive && state.sortDir === "desc");
+  });
+}
+
+sortHeaders.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.sort;
+    if (state.sortBy === key) {
+      state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+    } else {
+      state.sortBy = key;
+      // sensible default direction per column
+      state.sortDir = key === "title" ? "asc" : "desc";
+    }
+    updateSortHeaderUI();
+    renderTable();
+  });
+});
+
+/* ---------------------------------------------------------
+   Rating filter (5 clickable stars, "at least N stars")
+--------------------------------------------------------- */
+const ratingFilterStarsEl = document.getElementById("ratingFilterStars");
+
+function renderRatingFilter() {
+  ratingFilterStarsEl.innerHTML = "";
+  for (let i = 1; i <= 5; i++) {
+    const btn = document.createElement("button");
+    btn.className = "rating-star-btn" + (i <= state.minRating ? " lit" : "");
+    btn.setAttribute("aria-label", `Show ${i} star and up`);
+    btn.innerHTML = starIconLarge();
+    btn.addEventListener("click", () => {
+      // clicking the star that's already the active threshold clears the filter
+      state.minRating = (state.minRating === i) ? 0 : i;
+      renderRatingFilter();
+      renderTable();
+    });
+    btn.addEventListener("mouseenter", () => previewRatingStars(i));
+    btn.addEventListener("mouseleave", () => previewRatingStars(state.minRating));
+    ratingFilterStarsEl.appendChild(btn);
+  }
+}
+
+function previewRatingStars(n) {
+  const btns = ratingFilterStarsEl.querySelectorAll(".rating-star-btn");
+  btns.forEach((btn, idx) => {
+    btn.classList.toggle("lit", idx < n);
+  });
+}
+
+function starIconLarge() {
+  return `<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+    <path d="M12 2.5l2.9 6.53 7.1.62-5.4 4.73 1.63 6.98L12 17.77l-6.23 3.6 1.63-6.99-5.4-4.72 7.1-.62L12 2.5z"/>
+  </svg>`;
+}
+
+/* ---------------------------------------------------------
+   Init
+--------------------------------------------------------- */
+renderGenreDropdown();
+updateGenreButtonLabel();
+renderRatingFilter();
+updateSortHeaderUI();
+renderTable();
+</script>
+</body>
+</html>
